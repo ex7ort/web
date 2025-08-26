@@ -1,0 +1,902 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="Icon" href="12.ico" type="image/x-icon">
+    <title>MADE BY HIRAD</title>
+    <style>
+
+
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        #overlay-text {
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(245, 245, 247, 0.9);
+            letter-spacing: 2px;
+            transition: transform 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        #play-button {
+            display: none; /* Den alten Button verstecken */
+        }
+
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            color: #ffffff;
+            line-height: 1.6;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+            position: relative;
+        }
+
+        /* Video Hintergrund */
+        /* Video Hintergrund - anfangs im Vordergrund */
+        #background-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 10; /* Höherer z-index als der Container, aber niedriger als der Overlay */
+        }
+
+
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem 1rem;
+            background: rgba(0, 0, 0, 0.5); /* Background darken for contrast */
+            border-radius: 12px;
+            height: auto; /* Stellt sicher, dass die Höhe des Containers sich dem Inhalt anpasst */
+            margin-bottom: 2rem; /* Damit der Container nicht den gesamten verfügbaren Platz füllt */
+            perspective: 1000px;
+        }
+
+
+
+        /* Music control button styling */
+        #music-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+
+        #music-toggle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+            #music-toggle:hover {
+                transform: scale(1.1);
+                background-color: rgba(255, 255, 255, 1);
+            }
+
+        #music-icon {
+            color: #000;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        /* Volume slider container */
+        #volume-container {
+            width: 0;
+            overflow: hidden;
+            transition: width 0.3s ease;
+            margin-right: 8px;
+        }
+
+        #music-control:hover #volume-container {
+            width: 100px;
+        }
+
+        /* Volume slider styling */
+        #volume-slider {
+            width: 100px;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 3px;
+            outline: none;
+        }
+
+            #volume-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: white;
+                cursor: pointer;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+            #volume-slider::-moz-range-thumb {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: white;
+                cursor: pointer;
+                border: none;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+
+
+
+
+        /* Bio Card */
+        .bio-card {
+            background: linear-gradient(180deg, rgba(41, 41, 60, 0.6) 0%, rgba(28, 28, 40, 0.6) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 19px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            transform-style: preserve-3d;
+            transition: transform 0.08s ease-out;
+            transform: rotateX(0) rotateY(0);
+        }
+
+            .bio-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 3px;
+                background: linear-gradient(90deg, #ffffff, #ffffff, #ffffff);
+                z-index: 2;
+            }
+
+        .bio-header {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 0px solid rgba(255, 255, 255, 0.3));
+            overflow: hidden;
+            position: relative;
+        }
+
+            .avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .profile-info h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            background: linear-gradient(90deg, #FFFFFF, rgba(255, 255, 255, 0.3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .profile-info p {
+            color: rgba(245, 245, 247, 0.8);
+            font-size: 0.95rem;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 0.25rem 0.6rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 1);
+        }
+
+        .bio-description {
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            color: rgba(245, 245, 247, 0.9);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+
+            .stats-grid .stat-card:first-child .stat-value {
+                background: linear-gradient(to bottom, #ffffff, #000000);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+
+
+
+
+            .stats-grid .stat-card:first-child .stat-value {
+                color: #00ffcc;
+            }
+
+
+
+        .stat-card {
+            background: rgba(30, 30, 45, 0.6);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #9b87f5;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(245, 245, 247, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Games & Socials */
+        .section-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: rgb(255, 255, 255, 0.8);
+            position: relative;
+            padding-left: 1rem;
+        }
+
+            .section-title::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 16px;
+                background: #ffffff;
+                border-radius: 2px;
+            }
+
+        .games-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .game-card {
+            background: rgba(30, 30, 45, 0.6);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        
+
+          
+
+            .game-card:hover {
+                transform: translateY(-5px);
+                text-decoration: none;
+            }
+
+        .game-img {
+            height: 100px;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .game-info {
+            padding: 0.8rem;
+        }
+
+        .game-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .game-hours {
+            font-size: 0.8rem;
+            color: rgba(245, 245, 247, 0.7);
+        }
+
+        /* Socials */
+        .socials {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-link {
+            background: rgba(30, 30, 45, 0.6);
+            color: #F5F5F7;
+            text-decoration: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+            .social-link:hover {
+                background: #7E69AB;
+            }
+
+        .social-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Bio code section */
+        .code-section {
+            background: rgba(20, 20, 30, 0.8);
+            border-radius: 8px;
+            padding: 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .code-title {
+            font-size: 0.9rem;
+            color: rgba(245, 245, 247, 0.7);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn {
+            background: rgb(255, 255, 255, 0.5);
+            color: #000000;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+            .copy-btn:hover {
+                background: rgb(255, 255, 255, 0.9);
+            }
+
+        .code-content {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: rgba(245, 245, 247, 0.9);
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 0rem 0;
+            color: rgba(245, 245, 247, 0.6);
+            font-size: 0.85rem;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .bio-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-info {
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .socials {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .bio-card {
+                padding: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .games-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- Music control button with volume slider -->
+    <div id="music-control">
+        <div id="volume-container">
+            <input type="range" id="volume-slider" min="0" max="100" value="100" step="1">
+        </div>
+        <button id="music-toggle" aria-label="Toggle music">
+            <div id="music-icon">&#9658;</div>
+        </button>
+    </div>
+
+
+
+    <!-- Video als Hintergrund -->
+    <video autoplay muted loop id="background-video">
+        <source src="1212.mp4" type="video/mp4">
+        Dein Browser unterstützt das Video-Tag nicht.
+    </video>
+
+    <div id="musik-player">
+        <audio id="background-music" loop>
+            <source src="chani.mp3" type="audio/mp3">
+        </audio>
+        <button id="play-button" onclick="playMusic()">▶️ Musik abspielen</button>
+    </div>
+
+    <!-- Der neue Overlay -->
+    <div id="overlay" onclick="playMusic()">
+        <div id="overlay-text">CLICK ME</div>
+    </div>
+
+
+    <div class="container">
+        <div class="bio-card">
+            <div class="bio-header">
+                <div class="avatar">
+                    <img src="https://i.imgur.com/nkUJGEk.png" alt="Gaming Profile" />
+                </div>
+                <div class="profile-info">
+                    <h1>hirad</h1>
+                    <p></p>
+                    <span class="tag">C++</span>
+                    <span class="tag">G80</span>
+                </div>
+            </div>
+
+
+            <h2 class="section-title">TOP ARTIST</h2>
+            <div class="games-container">
+                <div class="games-list">
+                    <!-- Projekt 1 -->
+                    <a href="https://www.youtube.com/watch?v=s1phjLbyI88&ab_channel=HypnotizeEntertainment" class="game-card" target="_blank">
+                        <div class="game-title">ㅤㅤㅤㅤㅤㅤDARDAN</div>
+                        <div class="game-img" style="background-image: url('https://i.imgur.com/peSMsqH.png');"></div>
+                    </a>
+                    <!-- Projekt 2 -->
+                    <a href="https://www.youtube.com/watch?v=IH5EqvJmz-Y&ab_channel=XWAVE" class="game-card" target="_blank">
+                        <div class="game-title">ㅤㅤㅤㅤㅤㅤKARDO</div>
+                        <div class="game-img" style="background-image: url('https://i.imgur.com/c9WmJLP.jpeg'); "></div>
+                    </a>
+                    <!-- Projekt 3 -->
+                    <a href="https://www.youtube.com/watch?v=o5l13BrvAZo&ab_channel=MOONBOYSENTERTAINMENT" class="game-card" target="_blank">
+                        <div class="game-title">ㅤㅤㅤㅤㅤㅤNIMO</div>
+                        <div class="game-img" style="background-image: url('https://i.imgur.com/A2Jm0UP.png'); "></div>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">DREAM</h2>
+            <div class="games-list">
+                <a href="https://suchen.mobile.de/fahrzeuge/search.html?isSearchRequest=true&ms=3500%3B45%3B%3Bg80&ref=srpHead&refId=c7f00b13-7c68-7fc8-639a-9ebb5256858b&s=Car&sb=p&st=DEALER&vc=Car" target="_blank" class="game-card">
+                    <div class="game-img" style="background-image: url(https://i.imgur.com/Axt4R7X.jpeg);"></div>
+                    <div class="game-info">
+                        <div class="game-title">BMW M3 G80</div>
+                        <div class="game-hours">95.100€</div>
+                        <div class="game-hours">510 PS</div>
+                        <div class="game-hours">0–100 km/h - 3,5 seconds</div>
+                    </div>
+                </a>
+
+                <a href="https://suchen.mobile.de/fahrzeuge/search.html?isSearchRequest=true&ms=3500%3B93%3B%3BCSL&ref=dsp&s=Car&sb=p&st=DEALER&vc=Car" target="_blank" class="game-card">
+                    <div class="game-img" style="background-image: url('https://i.imgur.com/4X5fDgX.jpeg');"></div>
+                    <div class="game-info">
+                        <div class="game-title">BMW M4 G82 CSL</div>
+                        <div class="game-hours">186.500€</div>
+                        <div class="game-hours">550 PS</div>
+                        <div class="game-hours">0–100 km/h - 3,7 seconds</div>
+                    </div>
+                </a>
+
+                <a href="https://suchen.mobile.de/fahrzeuge/search.html?isSearchRequest=true&ml=0%3A20000&ms=3500%3B46%3B%3Bf90&ref=srp&refId=a4bb770e-fdd4-5b50-c0e4-c093b03157bd&s=Car&sb=p&vc=Car" target="_blank" class="game-card">
+                    <div class="game-img" style="background-image: url('https://i.imgur.com/PLQUnAh.jpeg');"></div>
+                    <div class="game-info">
+                        <div class="game-title">BMW M5 F90</div>
+                        <div class="game-hours">142.900€</div>
+                        <div class="game-hours">600 PS</div>
+                        <div class="game-hours">0–100 km/h - 3,3 seconds</div>
+                    </div>
+                </a>
+            </div>
+
+            <h2 class="section-title">SOCIALS</h2>
+            <div class="socials">
+                <!-- YouTube Link hinzugefügt -->
+                <a href="https://www.youtube.com/yourname" class="social-link" target="_blank">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 16.5v-9c0-1.2-.98-2.25-2.2-2.25H5.2C3.98 5.25 3 6.3 3 7.5v9c0 1.2.98 2.25 2.2 2.25h13.6c1.22 0 2.2-1.05 2.2-2.25z"></path>
+                        <path d="M10.5 12.75L15 10l-4.5-2.75v5.5z"></path>
+                    </svg>
+                    YouTube
+                </a>
+                <a href="https://www.twitch.tv/yourname" class="social-link" target="_blank">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16.5 15.5v-6.5h-3.5v6.5h3.5z"></path>
+                        <path d="M7.5 15.5v-6.5h3.5v6.5h-3.5z"></path>
+                        <path d="M21 7.5v9c0 1.2-.98 2.25-2.2 2.25H5.2c-1.22 0-2.2-1.05-2.2-2.25v-9c0-1.2.98-2.25 2.2-2.25h13.6c1.22 0 2.2 1.05 2.2 2.25z"></path>
+                    </svg>
+                    Twitch
+                </a>
+
+                <!-- Discord Link -->
+                <a href="https://www.your-DC DC" class="social-link" target="_blank">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 4H6C4.89543 4 4 4.89543 4 6V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V6C20 4.89543 19.1046 4 18 4Z"></path>
+                        <path d="M12 8V16"></path>
+                        <path d="M8 12H16"></path>
+                    </svg>
+                    Discord
+                </a>
+
+                <!-- TikTok Link -->
+                <a href="https://www.tiktok.com/@Username" class="social-link" target="_blank">
+                    <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- TikTok Icon SVG -->
+                        <path d="M9.7 3.8c1.7 0 3.3.7 4.4 1.8 1.2 1.2 1.8 2.8 1.8 4.4 0 2.3-1.5 4.5-3.7 5.3-1.7.6-3.5.7-5.2.2-.7-.3-1.3-.8-1.7-1.5l-.4.3v3.1c.8.2 1.7.3 2.6.3 4.8 0 8.7-3.9 8.7-8.7S14.5 3.8 9.7 3.8zm0 14.5c-.7 0-1.4-.1-2-.4-.6-.2-1.1-.5-1.5-.9V7.4c.4-.3.9-.7 1.4-1 1.7-.8 3.6-1 5.3-.3.9.4 1.6 1.1 2.1 1.9.5.9.7 1.8.7 2.7s-.2 1.9-.7 2.7c-.5.8-1.2 1.5-2.1 1.9-1.7.7-3.6.5-5.3-.3-.5-.3-.9-.7-1.4-1V9.9l-.6.4z"></path>
+                    </svg>
+                    TikTok
+                </a>
+            </div>
+
+            <h2 class="section-title">MERKEN</h2>
+            <div class="code-section">
+                <div class="code-header">
+                    <div class="code-title">
+                        <svg class="social-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.5L14 3H8z"></path>
+                            <polyline points="14 3 14 8 19 8"></polyline>
+                        </svg>
+                        Hier hast du noch ein andere bio Website    (Click to Copy) -->
+                    </div>
+                    <button class="copy-btn" onclick="copyToClipboard()">Copy</button>
+                </div>
+                <div class="code-content" id="bio-code">
+
+                    https://fakecrime.bio/hirad
+
+
+
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2025 CUSTOM BIO WEBSITE | 𝗠𝗔𝗗𝗘 𝗕𝗬 𝗛𝗜𝗥𝗔𝗗
+        </footer>
+    </div>
+
+    <script>
+
+
+
+        // Wait for the page to fully load
+        window.addEventListener('load', function () {
+            // Get the card element
+            const card = document.querySelector('.bio-card');
+
+            if (!card) return; // Exit if card not found
+
+            // Store the original box-shadow to restore it later
+            const originalShadow = window.getComputedStyle(card).boxShadow;
+
+            // Add enhanced shadow for 3D effect
+            card.style.boxShadow = originalShadow + ', 0 15px 40px rgba(0, 0, 0, 0.6)';
+            card.style.transition = 'transform 0.05s ease-out';
+
+            // Track mouse movement with reduced rotation angles
+            document.addEventListener('mousemove', function (e) {
+                // Calculate window center
+                const windowCenterX = window.innerWidth / 2;
+                const windowCenterY = window.innerHeight / 2;
+
+                // Calculate offsets from center (as percentage of window size)
+                const offsetX = (e.clientX - windowCenterX) / windowCenterX;
+                // Reduce vertical rotation by half for less extreme movement
+                const offsetY = (e.clientY - windowCenterY) / windowCenterY * 0.5;
+
+                // Convert to rotation angles (maximum 7 degrees instead of 10)
+                const rotateY = offsetX * 7;
+                const rotateX = -offsetY * 7; // Reduced and negative for natural direction
+
+                // Apply rotation
+                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            // Reset rotation when mouse leaves window
+            document.addEventListener('mouseout', function (e) {
+                if (!e.relatedTarget) {
+                    card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+                }
+            });
+
+            // Set up volume control
+            const volumeSlider = document.getElementById('volume-slider');
+            const music = document.getElementById('background-music');
+
+            if (volumeSlider && music) {
+                // Set initial volume
+                music.volume = volumeSlider.value / 100;
+
+                // Update volume when slider changes
+                volumeSlider.addEventListener('input', function () {
+                    music.volume = this.value / 100;
+                });
+
+                // Listen for the 'play' event to update the state properly
+                music.addEventListener('play', function () {
+                    isMusicPlaying = true;
+                });
+
+                // Listen for the 'pause' event to update the state properly
+                music.addEventListener('pause', function () {
+                    isMusicPlaying = false;
+                });
+            }
+
+            // Set up music toggle button
+            const musicToggle = document.getElementById('music-toggle');
+            if (musicToggle) {
+                musicToggle.addEventListener('click', toggleMusic);
+            }
+
+            // Set up overlay click
+            const overlay = document.getElementById('overlay');
+            if (overlay) {
+                overlay.addEventListener('click', function () {
+                    playMusic();
+                    // Also set the music playing state here
+                    isMusicPlaying = true;
+                });
+            }
+        });
+
+        // Globale Variable für den Musikstatus
+        let isMusicPlaying = false;
+
+        function toggleMusic() {
+            const music = document.getElementById('background-music');
+
+            if (!music.paused) {
+                // Wenn die Musik aktuell spielt, stoppe sie
+                music.pause();
+            } else {
+                // Wenn die Musik nicht spielt, starte sie
+                music.play()
+                    .then(() => {
+                        // Hide overlay if it's still visible
+                        const overlay = document.getElementById('overlay');
+                        if (overlay && overlay.style.display !== 'none') {
+                            overlay.style.display = 'none';
+
+                            // Move video to background
+                            const video = document.getElementById('background-video');
+                            if (video) {
+                                video.style.zIndex = "-1";
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error playing music:", error);
+                    });
+            }
+        }
+
+        function playMusic() {
+            const music = document.getElementById('background-music');
+            const video = document.getElementById('background-video');
+
+            music.play()
+                .then(() => {
+                    // Hide overlay
+                    const overlay = document.getElementById('overlay');
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+
+                    // Move video to background
+                    if (video) {
+                        video.style.zIndex = "-1";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error playing music:", error);
+                });
+        }
+
+
+
+
+        // Wait for the page to fully load
+        window.addEventListener('load', function () {
+            // Get the card element
+            const card = document.querySelector('.bio-card');
+
+            if (!card) return; // Exit if card not found
+
+            // Store the original box-shadow to restore it later
+            const originalShadow = window.getComputedStyle(card).boxShadow;
+
+            // Add enhanced shadow for 3D effect
+            card.style.boxShadow = originalShadow + ', 0 15px 40px rgba(0, 0, 0, 0.6)';
+            card.style.transition = 'transform 0.05s ease-out';
+
+            // Track mouse movement with greatly reduced vertical rotation
+            document.addEventListener('mousemove', function (e) {
+                // Calculate window center
+                const windowCenterX = window.innerWidth / 2;
+                const windowCenterY = window.innerHeight / 2;
+
+                // Calculate offsets from center (as percentage of window size)
+                const offsetX = (e.clientX - windowCenterX) / windowCenterX;
+                // Reduce vertical rotation by 75% for much less extreme movement
+                const offsetY = (e.clientY - windowCenterY) / windowCenterY * 0.75;
+
+                // Convert to rotation angles (maximum 5 degrees horizontally, 3 degrees vertically)
+                const rotateY = offsetX * 5;
+                const rotateX = -offsetY * 4; // Much more reduced vertical movement
+
+                // Apply rotation
+                card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            // Reset rotation when mouse leaves window
+            document.addEventListener('mouseout', function (e) {
+                if (!e.relatedTarget) {
+                    card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+                }
+            });
+
+            // Rest of your code stays the same...
+        });
+
+
+        function playMusic() {
+            const music = document.getElementById('background-music');
+            const video = document.getElementById('background-video');
+
+            music.play()
+                .then(() => {
+                    // Wenn die Musik erfolgreich startet, Overlay ausblenden
+                    document.getElementById('overlay').style.display = 'none';
+
+                    // Video in den Hintergrund verschieben
+                    video.style.zIndex = "-1";
+
+                    // NICHT die Container-z-index ändern, nur Video in den Hintergrund
+                    // document.querySelector('.container').style.zIndex = "20"; -- entfernen
+                })
+                .catch(error => {
+                    console.error("Fehler beim Abspielen der Musik:", error);
+                });
+        }
+
+
+        function copyToClipboard() {
+            const codeContent = document.getElementById('bio-code');
+
+            // Verwende die moderne Clipboard API statt eines textarea Elements
+            navigator.clipboard.writeText(codeContent.textContent.trim())
+                .then(() => {
+                    // Nur bei Erfolg den Button-Text ändern
+                    const copyBtn = document.querySelector('.copy-btn');
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Fehler beim Kopieren: ', err);
+                });
+        }
+    </script>
+</body>
+</html>
